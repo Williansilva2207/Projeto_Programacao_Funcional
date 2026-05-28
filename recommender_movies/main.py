@@ -1,38 +1,43 @@
 from data import catalogo, usuario
 from recommender import pontuar_catalogo, recomendar
 
-def executar_pipeline(usuario_entrada, catalogo_entrada):
+montar_resultado = lambda itens_pontuados, recomendacoes: {
+    "itens_pontuados": itens_pontuados,
+    "recomendacoes": recomendacoes,
+}
 
-    itens_pontuados = pontuar_catalogo(usuario_entrada, catalogo_entrada)
-    recomendacoes = recomendar(usuario_entrada, catalogo_entrada)
+executar_pipeline = lambda usuario_entrada, catalogo_entrada: (
+    lambda itens_pontuados, recomendacoes: montar_resultado(
+        itens_pontuados,
+        recomendacoes,
+    )
+)(
+    pontuar_catalogo(usuario_entrada, catalogo_entrada),
+    recomendar(usuario_entrada, catalogo_entrada),
+)
 
-    return {
-        "itens_pontuados": itens_pontuados,
-        "recomendacoes": recomendacoes,
-    }
+exibir_linha = lambda: print("-" * 60)
 
-def exibir_linha():
-    print("-" * 60)
+formatar_score = lambda item: (
+    "" if item.get("score") is None else f" | score: {item['score']:.2f}"
+)
 
-def exibir_item(item):
-    score = item.get("score")
-    score_texto = "" if score is None else f" | score: {score:.2f}"
+exibir_item = lambda item: (
+    print(f"{item['titulo']} ({item['tipo']})"),
+    print(f"  Tags: {', '.join(item['tags'])}{formatar_score(item)}"),
+)
 
-    print(f"{item['titulo']} ({item['tipo']})")
-    print(f"  Tags: {', '.join(item['tags'])}{score_texto}")
-
-def exibir_lista(titulo, itens):
-    print(titulo)
-    exibir_linha()
-
+exibir_lista = lambda titulo, itens: (
+    print(titulo),
+    exibir_linha(),
     list(
         map(
-            lambda item: exibir_item(item),
+            exibir_item,
             itens,
         )
-    )
-
-    print()
+    ),
+    print(),
+)
 
 resultado = executar_pipeline(usuario, catalogo)
 

@@ -1,8 +1,23 @@
-def similaridade_jaccard(interesses, tags):
+criar_conjunto = lambda valores: set(valores)
 
-    conjunto_interesses = set(interesses)
-    conjunto_tags = set(tags)
-    intersecao = conjunto_interesses.intersection(conjunto_tags)
-    uniao = conjunto_interesses.union(conjunto_tags)
+calcular_intersecao = lambda primeiro_conjunto, segundo_conjunto: (
+    primeiro_conjunto.intersection(segundo_conjunto)
+)
 
-    return 0 if len(uniao) == 0 else len(intersecao) / len(uniao)
+calcular_uniao = lambda primeiro_conjunto, segundo_conjunto: (
+    primeiro_conjunto.union(segundo_conjunto)
+)
+
+calcular_indice_jaccard = lambda intersecao, uniao: (
+    0 if len(uniao) == 0 else len(intersecao) / len(uniao)
+)
+
+similaridade_jaccard = lambda interesses, tags: (
+    lambda conjunto_interesses, conjunto_tags: calcular_indice_jaccard(
+        calcular_intersecao(conjunto_interesses, conjunto_tags),
+        calcular_uniao(conjunto_interesses, conjunto_tags),
+    )
+)(
+    criar_conjunto(interesses),
+    criar_conjunto(tags),
+)

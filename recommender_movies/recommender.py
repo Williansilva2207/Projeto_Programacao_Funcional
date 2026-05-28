@@ -1,37 +1,40 @@
 from similarity import similaridade_jaccard
 
-def pontuar_item(usuario, item):
-    return {
-        **item,
-        "score": similaridade_jaccard(usuario["interesses"], item["tags"]),
-    }
+calcular_score = lambda usuario, item: similaridade_jaccard(
+    usuario["interesses"],
+    item["tags"],
+)
 
-def pontuar_catalogo(usuario, catalogo):
-    return list(
-        map(
-            lambda item: pontuar_item(usuario, item),
-            catalogo,
-        )
-    )
+pontuar_item = lambda usuario, item: {
+    **item,
+    "score": calcular_score(usuario, item),
+}
 
-def filtrar_relevantes(itens_pontuados):
-   
-    return list(
-        filter(
-            lambda item: item["score"] > 0,
-            itens_pontuados,
-        )
+pontuar_catalogo = lambda usuario, catalogo: list(
+    map(
+        lambda item: pontuar_item(usuario, item),
+        catalogo,
     )
+)
 
-def ordenar_por_relevancia(itens):
-    return sorted(
-        itens,
-        key=lambda item: (-item["score"], item["titulo"]),
-    )
+item_tem_relevancia = lambda item: item["score"] > 0
 
-def recomendar(usuario, catalogo):
-    return ordenar_por_relevancia(
-        filtrar_relevantes(
-            pontuar_catalogo(usuario, catalogo)
-        )
+chave_relevancia = lambda item: (-item["score"], item["titulo"])
+
+filtrar_relevantes = lambda itens_pontuados: list(
+    filter(
+        item_tem_relevancia,
+        itens_pontuados,
     )
+)
+
+ordenar_por_relevancia = lambda itens: sorted(
+    itens,
+    key=chave_relevancia,
+)
+
+recomendar = lambda usuario, catalogo: ordenar_por_relevancia(
+    filtrar_relevantes(
+        pontuar_catalogo(usuario, catalogo)
+    )
+)
