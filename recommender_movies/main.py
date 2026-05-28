@@ -6,12 +6,7 @@ montar_resultado = lambda itens_pontuados, recomendacoes: {
     "recomendacoes": recomendacoes,
 }
 
-executar_pipeline = lambda usuario_entrada, catalogo_entrada: (
-    lambda itens_pontuados, recomendacoes: montar_resultado(
-        itens_pontuados,
-        recomendacoes,
-    )
-)(
+executar_pipeline = lambda usuario_entrada, catalogo_entrada: montar_resultado(
     pontuar_catalogo(usuario_entrada, catalogo_entrada),
     recomendar(usuario_entrada, catalogo_entrada),
 )
